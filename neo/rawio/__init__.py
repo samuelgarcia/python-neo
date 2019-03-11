@@ -17,6 +17,7 @@ from neo.rawio.brainvisionrawio import BrainVisionRawIO
 from neo.rawio.elanrawio import ElanRawIO
 from neo.rawio.intanrawio import IntanRawIO
 from neo.rawio.micromedrawio import MicromedRawIO
+from neo.rawio.msrdrawio import MsrdRawIO
 from neo.rawio.neuralynxrawio import NeuralynxRawIO
 from neo.rawio.neuroexplorerrawio import NeuroExplorerRawIO
 from neo.rawio.neuroscoperawio import NeuroScopeRawIO
@@ -36,6 +37,7 @@ rawiolist = [
     ElanRawIO,
     IntanRawIO,
     MicromedRawIO,
+    MsrdRawIO,
     NeuralynxRawIO,
     NeuroExplorerRawIO,
     NeuroScopeRawIO,
