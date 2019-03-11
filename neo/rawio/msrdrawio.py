@@ -58,8 +58,8 @@ class MsrdRawIO(BaseRawIO):
                     if chan['RawDataType'] == 'Int' and chan['ADCBits'] == '16':
                         dt = 'int16'
                     else:
-                        raise(NotImplementedError('Only int16 at the moment'))
-                    gain = float(chan['ConversionFactor'])
+                        raise(NotImplementedError('Only int16 at the moment'))['cumsum']
+                    gain = 1. / float(chan['ConversionFactor'])
                     offset = 0.
                     #~ print(chan['ChID'], chan['Entity'], chan['Label'])
                     sig_channels.append((chan['Label'], chan['ChID'], sampling_rate,
@@ -95,7 +95,7 @@ class MsrdRawIO(BaseRawIO):
         entity = self.sig_entities[0]
         #~ print('entity', entity)
         print(self._data_blocks[entity]['size'])
-        self._signal_length  = np.sum(self._data_blocks[entity]['size']) // 2
+        self._signal_length  = np.sum(self._data_blocks[entity]['size']) // 4
         print('self._signal_length', self._signal_length)
         #~ return size
         #~ exit()
@@ -150,11 +150,18 @@ class MsrdRawIO(BaseRawIO):
             # loop over data blocks and get chunks
             bl0 = np.searchsorted(data_blocks['cumsize'], i_start, side='left')
             bl1 = np.searchsorted(data_blocks['cumsize'], i_stop, side='left')
+            print('bl0', bl0, 'bl1', bl1)
             ind = 0
             for bl in range(bl0, bl1):
+                print()
+                print('bl', bl)
                 ind0 = data_blocks[bl]['pos']
                 ind1 = data_blocks[bl]['size'] + ind0
-                data = self._memmap[ind0:ind1].view('int16')
+                print(data_blocks[bl]['size'])
+                print(ind0, ind1)
+                print(self._memmap[ind0:ind1].shape)
+                data = self._memmap[ind0:ind1].view('int32')
+                print(data.shape)
                 if bl == bl1 - 1:
                     # right border
                     # be carfull that bl could be both bl0 and bl1!!
@@ -164,6 +171,9 @@ class MsrdRawIO(BaseRawIO):
                     # left border
                     border = i_start - data_blocks[bl]['cumsize']
                     data = data[border:]
+                print()
+                print(data.shape)
+                print(ind, data.size + ind, c)
                 raw_signals[ind:data.size + ind, c] = data
                 ind += data.size
 
@@ -298,7 +308,7 @@ def parse_msrd_raw_header(filename):
             keep = raw_blocks['entity'] == entity
             block_by_entity = raw_blocks[keep].copy()
             block_by_entity['cumsize'][0] = 0
-            block_by_entity['cumsize'][1:] = np.cumsum(block_by_entity['size'][:-1])
+            block_by_entity['cumsize'][1:] = np.cumsum(block_by_entity['size'][:-1]) // 4
             block_by_entities[entity] = block_by_entity
         
         info['block_by_entities'] = block_by_entities
