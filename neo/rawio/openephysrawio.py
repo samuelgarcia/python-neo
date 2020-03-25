@@ -229,7 +229,7 @@ class OpenEphysRawIO(BaseRawIO):
         # and message.events (text based)      --> event 1 not implemented yet
         event_channels = []
         self._events_memmap = {}
-        for ix, seg_index in enumerate(seg_indices):
+        for seg_index in seg_indices:
             if seg_index == 0:
                 event_filename = 'all_channels.events'
             else:
@@ -257,7 +257,7 @@ class OpenEphysRawIO(BaseRawIO):
         # Annotate some objects from coninuous files
         self._generate_minimal_annotations()
         bl_ann = self.raw_annotations['blocks'][0]
-        for ix, seg_index in enumerate(seg_indices):
+        for seg_index in seg_indices:
             seg_ann = bl_ann['segments'][seg_index]
             if len(info['continuous']) > 0:
                 fullname = os.path.join(self.dirname, info['continuous'][seg_index][0])
